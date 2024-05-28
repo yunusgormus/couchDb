@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Kütüphanesi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Ana arkaplan */
+        
+        body {
+            background-color: #f8f9fa;
+            background-image: url('https://www.transparenttextures.com/patterns/axiom-pattern.png');
+        }
+        /* Başlık efekti */
+        
+        .heading {
+            position: relative;
+            display: inline-block;
+            font-size: 3em;
+            font-weight: bold;
+            color: #007bff;
+            cursor: pointer;
+        }
+        
+        .heading::before {
+            content: 'Veri Tabanı Projesi';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 3px;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: -1;
+        }
+        
+        .heading:hover::before {
+            width: 0;
+        }
+        /* Kart resimleri boyutlandırma */
+        
+        .card-img-top {
+            height: auto;
+            max-height: 300px;
+            width: 100%;
+            object-fit: contain;
+            position: relative;
+        }
+        /* Kartın üzerine gelince metnin görünürlüğü */
+        
+        .card:hover .card-img-overlay {
+            opacity: 1;
+        }
+        /* Metin kutusu */
+        
+        .card-img-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        /* Kart içeriği */
+        
+        .card-body {
+            position: relative;
+            z-index: 1;
+        }
+        /* Kart başlıkları */
+        
+        .card-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .card-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #007bff;
+            margin-top: 10px;
+        }
+        /* Kart içeriği */
+        
+        .card-text {
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-5 heading">Veri Tabanı Projesi</h1>
+
+        <!-- Kitap Ekle Formu -->
+        <form class="form-container mb-4" method="post" action="/kitap/ekle">
+            <div class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" name="kitapAdi" placeholder="Kitap Adı">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="kitapYazari" placeholder="Yazar Adı">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="kategori" placeholder="Kategori">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="resim" placeholder="Resim URL">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Kitap Ekle</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Kitap Ara Formu -->
+        <form class="form-container mb-4" method="post" action="/kitap/ara">
+            <div class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" name="aramaKelimesi" placeholder="Kitap Ara">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Ara</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Kitap Güncelle Formu -->
+        <form class="form-container mb-4" method="post" action="/kitap/guncelle">
+            <div class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" name="kitapAdi" placeholder="Kitap Adı">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="yeniKitapAdi" placeholder="Yeni Kitap Adı">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="yeniKitapYazari" placeholder="Yeni Yazar Adı">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="yeniKategori" placeholder="Yeni Kategori">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="yeniResim" placeholder="Yeni Resim URL">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Kitap Güncelle</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Kitap Listesi -->
+        <div class="row">
+            <% kitaplar.forEach(function(kitap) { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card position-relative">
+                        <img src="<%= kitap.value.resim %>" class="card-img-top" alt="Kitap Resmi">
+                        <div class="card-img-overlay d-flex justify-content-center align-items-center">
+                            <p>
+                                <%= kitap.value.kitapAdi %><br>
+                                    <%= kitap.value.kitapYazari %><br>
+                                        <%= kitap.value.kategori %>
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= kitap.value.kitapAdi %>
+                            </h5>
+                            <p class="card-text">Yazar:
+                                <%= kitap.value.kitapYazari %>
+                            </p>
+                            <p class="card-text">Kategori:
+                                <%= kitap.value.kategori %>
+                            </p>
+                            <a href="#" class="btn btn-primary">Daha Fazla Bilgi</a>
+                            <form method="post" action="/kitap/delete/<%= kitap.key %>">
+                                <input type="hidden" value="<%= kitap.value.rev %>" name="rev">
+                                <button type="submit" class="btn btn-danger mt-2">Sil</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+    </div>
+</body>
+
+</html>
